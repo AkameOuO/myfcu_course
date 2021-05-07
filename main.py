@@ -31,10 +31,12 @@ def main():
     #time.sleep(5)
     #driver.find_element_by_xpath('//input[@type="checkbox"]').click()
     
-    dw(5)
-    soup = BS(driver.page_source,lxml)
+    dw(3)
+    lessons = BS(driver.page_source,"lxml").find_all("tr",{"class":"ng-scope","ng-repeat":"cur in linecourselists"})
 
-    soup.find()
+    
+    print(make_course(lessons))
+    
 
     """js = ""\"var xmlhttp=new XMLHttpRequest();
         xmlhttp.open("GET","http://127.0.0.1/get.php",false);
@@ -46,12 +48,30 @@ def main():
 	    ""\" 
     resp = brower.execute_script(js)"""
 
-    input()
+    input("click to close:")
     
     driver.close()
 
     #dat = get_course(cookies)
     #print(dat)
+
+def make_course(lessons):
+    print(lessons)
+    res = [[None for i in range(5)] for j in range(14)]
+    week_ch = "一二三四五"
+    for l in lessons:
+        l_data = l.find_all("td")
+        week = week_ch.find(clean(l_data[0].text)[1])
+        if week == -1:
+            continue
+        session = int(clean(l_data[0].text)[3:5])-1
+        res[session][week] =[clean(l_data[1].text),clean(l_data[3].text).split('(')[0]]
+        print(session,week)
+    
+    return res
+
+def clean(s):
+    return s.replace("\n","").replace(" ","")
 
 """
 def get_course(cookies="",year=109,smester=2):
