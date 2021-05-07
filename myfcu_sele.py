@@ -34,6 +34,8 @@ def main():
     dw(5)
     soup = BS(driver.page_source,lxml)
 
+    soup.find()
+
     """js = ""\"var xmlhttp=new XMLHttpRequest();
         xmlhttp.open("GET","http://127.0.0.1/get.php",false);
         xmlhttp.setRequestHeader("Content-type","application/x-www-form-urlencoded");
