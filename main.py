@@ -40,7 +40,9 @@ def main():
         "tr", {"class": "ng-scope", "ng-repeat": "cur in linecourselists"})
 
     driver.close()
-    print_course(make_course(lessons))
+    res = make_course(lessons)
+    print_course(res)
+    save_course(res)
 
     """js = ""\"var xmlhttp=new XMLHttpRequest();
         xmlhttp.open("GET","http://127.0.0.1/get.php",false);
@@ -83,14 +85,27 @@ def print_course(lessons):
     for c in "一二三四五":
         print(f"{c: ^11}",end="|")
     print()
-    print_line()
+    print(create_line())
     for session in lessons:
         for i in range(5):
             for s in session:
                 print(s[i],end="|")
             print()
-        print_line()
+        print(create_line())
 
+def save_course(lessons):
+    with open("course.txt","w") as f:
+        f.write("  |")
+        for c in "一二三四五":
+            f.write(f"{c: ^11}|")
+        f.write("\n")
+        f.write(create_line()+"\n")
+        for session in lessons:
+            for i in range(5):
+                for s in session:
+                    f.write(s[i]+"|")
+                f.write("\n")
+            f.write(create_line()+"\n")
 
 def format_lesson(name,room):
     res = ["","","","",room]
@@ -134,12 +149,12 @@ def width(s):
 def clean(s):
     return s.replace("\n", "").replace(" ", "")
 
-def print_line(l=5):
-    print("--",end="|")
+def create_line(l=5):
+    s = "--|"
     for i in range(l):
         i = i + 0
-        print("-"*12,end="|")
-    print()
+        s += ("-"*12+"|")
+    return s
 """
 def get_course(cookies="",year=109,smester=2):
     data = {
