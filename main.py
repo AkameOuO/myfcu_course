@@ -2,6 +2,7 @@ import os
 import json
 import lxml
 import time
+import getpass
 import unicodedata
 import configparser
 import requests as rq
@@ -11,17 +12,24 @@ from selenium import webdriver
 
 
 def main():
-    config = configparser.ConfigParser()
-    config.read("config.ini")
+    os.system("")
+    try:
+        config = configparser.ConfigParser()
+        config.read("config.ini")
+        urn = config["user"]["username"]
+        pwd = config["user"]["password"]
+    except:
+        print("Failed to load config.ini,please input data.")
+        urn = input("Username:")
+        pwd = input("Password:\033[47m")
+        print("\033[0m", end="")
 
     driver = webdriver.Chrome()  # Firefox()
 
     driver.get("https://myfcu.fcu.edu.tw/main/infomyfculogin.aspx")
 
-    driver.find_element_by_name("txtUserName").send_keys(
-        config["user"]["username"])
-    driver.find_element_by_name("txtPassword").send_keys(
-        config["user"]["password"])
+    driver.find_element_by_name("txtUserName").send_keys(urn)
+    driver.find_element_by_name("txtPassword").send_keys(pwd)
     driver.find_element_by_name("OKButton").click()
 
     """cookies = ""
@@ -40,6 +48,7 @@ def main():
         "tr", {"class": "ng-scope", "ng-repeat": "cur in linecourselists"})
 
     driver.close()
+
     res = make_course(lessons)
     print_course(res)
     save_course(res)
@@ -56,16 +65,16 @@ def main():
 
     input("press enter to close:")
 
-
     #dat = get_course(cookies)
     # print(dat)
 
 
 def make_course(lessons):
-    print(lessons)
-    fl = format_lesson("","")
+    clean = lambda s :s.replace("\n", "").replace(" ", "")
+    #print(lessons)
+    fl = format_lesson("", "")
     res = [[fl for i in range(5)] for j in range(14)]
-    
+
     week_ch = "一二三四五"
     for l in lessons:
         l_data = l.find_all("td")
@@ -73,59 +82,70 @@ def make_course(lessons):
         if week == -1:
             continue
         session = int(clean(l_data[0].text)[3:5])-1
-        res[session][week] = format_lesson(clean(l_data[1].text),clean(l_data[3].text).split('(')[0])
+        res[session][week] = format_lesson(
+            clean(l_data[1].text), clean(l_data[3].text).split('(')[0])
 
     for i in range(14):
-        res[i].insert(0,["  ","  ",f"{i+1:02d}","  ","  "])
+        res[i].insert(0, ["|  ", "|  ", f"|{i+1:02d}", "|  ", "|  "])
     return res
 
+
 def print_course(lessons):
+    create_line = lambda l:f"|--|"+("-"*12+"|")*l
+
     os.system("cls")
-    print("  ",end="|")
+    print(create_line(5))
+    print("|  ", end="|")
     for c in "一二三四五":
-        print(f"{c: ^11}",end="|")
+        print(f"{c: ^11}", end="|")
     print()
-    print(create_line())
+    print(create_line(5,))
     for session in lessons:
         for i in range(5):
             for s in session:
-                print(s[i],end="|")
+                print(s[i], end="|")
             print()
-        print(create_line())
+        print(create_line(5))
+    print("\033[1A",end="")
+    print(create_line(5))
 
 def save_course(lessons):
-    with open("course.txt","w") as f:
-        f.write("  |")
+    create_line = lambda l:f"|--|"+("-"*12+"|")*l
+
+    with open("course.txt", "w") as f:
+        f.write(create_line(5)+"\n")
+        f.write("|  |")
         for c in "一二三四五":
             f.write(f"{c: ^11}|")
         f.write("\n")
-        f.write(create_line()+"\n")
+        f.write(create_line(5)+"\n")
         for session in lessons:
             for i in range(5):
                 for s in session:
                     f.write(s[i]+"|")
                 f.write("\n")
-            f.write(create_line()+"\n")
+            f.write(create_line(5)+"\n")
 
-def format_lesson(name,room):
-    res = ["","","","",room]
+
+def format_lesson(name, room):
+    res = ["", "", "", "", room]
     index_ = 0
     len_ = 0
     for c in name:
         size_ = 1
         if unicodedata.east_asian_width(c) == 'W':
             size_ += 1
-        print(c,size_)
+        print(c, size_)
         if len_ + size_ > 12:
             len_ = 0
             index_ += 1
 
         res[index_] += c
         len_ += size_
-    
+
     if len(res[2]) == 0:
         res.pop(2)
-        res.insert(0,"")
+        res.insert(0, "")
 
     for i in range(5):
 
@@ -135,8 +155,8 @@ def format_lesson(name,room):
             else:
                 res[i] = ' ' + res[i]
 
-
     return res
+
 
 def width(s):
     size_ = 0
@@ -146,15 +166,7 @@ def width(s):
             size_ += 1
     return size_
 
-def clean(s):
-    return s.replace("\n", "").replace(" ", "")
 
-def create_line(l=5):
-    s = "--|"
-    for i in range(l):
-        i = i + 0
-        s += ("-"*12+"|")
-    return s
 """
 def get_course(cookies="",year=109,smester=2):
     data = {
