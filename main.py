@@ -32,16 +32,8 @@ def main():
     driver.find_element_by_name("txtPassword").send_keys(pwd)
     driver.find_element_by_name("OKButton").click()
 
-    """cookies = ""
-
-    for coo in driver.get_cookies():
-        cookies += "{name}={value};".format(**coo)
-    """
-
     dw(1)
     driver.get("https://myfcu.fcu.edu.tw/main/S3202/S3202_timetable_new.aspx")
-    # time.sleep(5)
-    # driver.find_element_by_xpath('//input[@type="checkbox"]').click()
 
     dw(3)
     lessons = BS(driver.page_source, "lxml").find_all(
@@ -53,25 +45,12 @@ def main():
     print_course(res)
     save_course(res)
 
-    """js = ""\"var xmlhttp=new XMLHttpRequest();
-        xmlhttp.open("GET","http://127.0.0.1/get.php",false);
-        xmlhttp.setRequestHeader("Content-type","application/x-www-form-urlencoded");
-        xmlhttp.setRequestHeader("User-Agent","Mozilla/5.0");
-        xmlhttp.setRequestHeader("Cookie","");
-        xmlhttp.send("test=1");
-        return xmlhttp.responseText;
-	    ""\" 
-    resp = brower.execute_script(js)"""
-
     input("press enter to close:")
-
-    #dat = get_course(cookies)
-    # print(dat)
 
 
 def make_course(lessons):
-    clean = lambda s :s.replace("\n", "").replace(" ", "")
-    #print(lessons)
+    def clean(s): return s.replace("\n", "").replace(" ", "")
+    # print(lessons)
     fl = format_lesson("", "")
     res = [[fl for i in range(5)] for j in range(14)]
 
@@ -91,7 +70,7 @@ def make_course(lessons):
 
 
 def print_course(lessons):
-    create_line = lambda l:f"|--|"+("-"*12+"|")*l
+    def create_line(l): return f"|--|"+("-"*12+"|")*l
 
     os.system("cls")
     print(create_line(5))
@@ -106,11 +85,12 @@ def print_course(lessons):
                 print(s[i], end="|")
             print()
         print(create_line(5))
-    print("\033[1A",end="")
+    print("\033[1A", end="")
     print(create_line(5))
 
+
 def save_course(lessons):
-    create_line = lambda l:f"|--|"+("-"*12+"|")*l
+    def create_line(l): return f"|--|"+("-"*12+"|")*l
 
     with open("course.txt", "w") as f:
         f.write(create_line(5)+"\n")
@@ -166,22 +146,6 @@ def width(s):
             size_ += 1
     return size_
 
-
-"""
-def get_course(cookies="",year=109,smester=2):
-    data = {
-        "year":year,
-        "smester":smester
-    }
-    headers = {
-        "Cookie":cookies
-    }
-    r = rq.post("https://myfcu.fcu.edu.tw/main/S3202/S3202_timetable_new.aspx/GetCurriculum",data=data,headers=headers)
-    print(r)
-    print(r.text)
-    return json.loads(r.text)
-
-#driver.close()"""
 
 if __name__ == "__main__":
     main()
