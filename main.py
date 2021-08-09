@@ -12,7 +12,7 @@ from selenium import webdriver
 
 
 def main():
-    os.system("")
+    os.system("color F0")
     try:
         config = configparser.ConfigParser()
         config.read("config.ini")
@@ -54,10 +54,9 @@ def make_course(lessons):
     fl = format_lesson("", "")
     res = [[fl for i in range(5)] for j in range(14)]
 
-    week_ch = "一二三四五"
     for l in lessons:
         l_data = l.find_all("td")
-        week = week_ch.find(clean(l_data[0].text)[1])
+        week = "一二三四五".find(clean(l_data[0].text)[1])
         if week == -1:
             continue
         session = int(clean(l_data[0].text)[3:5])-1
@@ -108,6 +107,8 @@ def save_course(lessons):
 
 
 def format_lesson(name, room):
+    while len(room) and not room[-1].isnumeric():
+        room = room[:-1]
     res = ["", "", "", "", room]
     index_ = 0
     len_ = 0
@@ -128,12 +129,8 @@ def format_lesson(name, room):
         res.insert(0, "")
 
     for i in range(5):
-
-        for j in range(12-width(res[i])):
-            if j % 2 == 0:
-                res[i] = res[i] + ' '
-            else:
-                res[i] = ' ' + res[i]
+        w = 12-width(res[i])
+        res[i] = ' '*(w//2) + res[i] + ' '*(w//2+w%2)
 
     return res
 
