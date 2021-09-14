@@ -12,19 +12,22 @@ from selenium import webdriver
 
 
 def main():
-    os.system("color F0")
     try:
         config = configparser.ConfigParser()
         config.read("config.ini")
         urn = config["user"]["username"]
         pwd = config["user"]["password"]
+        light = config["user"]["light"] == "True"
     except:
-        print("Failed to load config.ini,please input data.")
+        print("Failed to load config.ini, please input data.")
         urn = input("Username:")
         pwd = input("Password:\033[47m")
         print("\033[0m", end="")
 
-    driver = webdriver.Chrome()  # Firefox()
+    if light:
+        os.system("color F0")
+
+    driver = webdriver.Chrome()
 
     driver.get("https://myfcu.fcu.edu.tw/main/infomyfculogin.aspx")
 
@@ -45,7 +48,7 @@ def main():
     print_course(res)
     save_course(res)
 
-    input("press enter to close:")
+    # input("press enter to close:")
 
 
 def make_course(lessons):
@@ -116,7 +119,7 @@ def format_lesson(name, room):
         size_ = 1
         if unicodedata.east_asian_width(c) == 'W':
             size_ += 1
-        print(c, size_)
+        # print(c, size_)
         if len_ + size_ > 12:
             len_ = 0
             index_ += 1

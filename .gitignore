@@ -2,3 +2,4 @@ config.ini
 course.txt
 chromedriver.exe
 __pycache__
+/geckodriver.log
